@@ -6,8 +6,11 @@ namespace WP_Rocket\Engine\Optimization\LazyRenderContent\Frontend;
 use WP_Rocket\Engine\Common\Context\ContextInterface;
 use WP_Rocket\Engine\Common\PerformanceHints\Frontend\ControllerInterface;
 use WP_Rocket\Engine\Optimization\LazyRenderContent\Frontend\Processor\Processor;
+use WP_Rocket\Engine\Support\CommentTrait;
 
 class Controller implements ControllerInterface {
+	use CommentTrait;
+
 	/**
 	 * Processor instance
 	 *
@@ -42,6 +45,10 @@ class Controller implements ControllerInterface {
 	 * @return string
 	 */
 	public function optimize( string $html, $row ): string {
+		if ( rocket_bypass() && $row->has_lrc() ) {
+			return $this->remove_hashes( $html );
+		}
+
 		if ( ! $row->has_lrc() ) {
 			return $this->remove_hashes( $html );
 		}
@@ -65,7 +72,9 @@ class Controller implements ControllerInterface {
 		$html = $result;
 		$html = $this->remove_hashes( $html );
 
-		return $this->add_css( $html );
+		$html = $this->add_css( $html );
+
+		return $this->add_meta_comment( 'automatic_lazy_rendering', $html );
 	}
 
 	/**
@@ -127,10 +136,6 @@ class Controller implements ControllerInterface {
 	 * @return string
 	 */
 	public function add_hashes( $html ) {
-		if ( ! $this->context->is_allowed() ) {
-			return $html;
-		}
-
 		if ( empty( $html ) ) {
 			return $html;
 		}
@@ -145,8 +150,27 @@ class Controller implements ControllerInterface {
 		$processor = wpm_apply_filters_typed( 'string', 'rocket_lrc_processor', 'dom' );
 
 		$this->processor->set_processor( $processor );
+		$this->processor->get_processor()->set_exclusions( $this->get_exclusions() );
 
 		return $this->processor->get_processor()->add_hashes( $html );
+	}
+
+	/**
+	 * Get the list of patterns to exclude from hash injection.
+	 *
+	 * @return string[]
+	 */
+	private function get_exclusions(): array {
+		/**
+		 * Filters the list of patterns to exclude from hash injection.
+		 *
+		 * @since 3.17.0.2
+		 *
+		 * @param string[] $exclusions The list of patterns to exclude from hash injection.
+		 */
+		$exclusions = wpm_apply_filters_typed( 'string[]', 'rocket_lrc_exclusions', [] );
+
+		return $exclusions;
 	}
 
 	/**

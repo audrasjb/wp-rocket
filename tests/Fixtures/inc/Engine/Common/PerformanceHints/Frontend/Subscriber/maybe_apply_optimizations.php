@@ -31,6 +31,30 @@ $lrc = [
 
 return [
 	'test_data' => [
+		'shouldReturnOriginalWhenBypassAndRow' => [
+			'config' => [
+				'query_string' => 'nowprocket',
+				'html' => $html_input,
+				'atf' => [
+					'row' => [
+						'status' => 'completed',
+						'url' => 'http://example.org',
+						'lcp'      => json_encode( (object) [
+							'type' => 'img',
+							'src'  => 'http://example.org/wp-content/uploads/image.jpg',
+						] ),
+						'viewport' => json_encode( [
+							0 => (object) [
+								'type' => 'img',
+								'src'  => 'http://example.org/wp-content/uploads/image2.jpg',
+							],
+						] ),
+					],
+				],
+				'lrc' => $lrc,
+			],
+			'expected' => $html_input,
+		],
 		'shouldReturnOriginalWhenQueryString' => [
 			'config' => [
 				'query_string' => 'wpr_lazyrendercontent',
@@ -43,6 +67,34 @@ return [
 				],
 			],
 			'expected' => $html_input,
+		],
+		'shouldReturnOriginalWhenDonotoptimize' => [
+			'config' => [
+				'donotrocketoptimize' => true,
+				'sass_visit' => false,
+				'html' => $html_input,
+				'atf' => [
+					'row' => null,
+				],
+				'lrc' => [
+					'row' => null,
+				],
+			],
+			'expected' => $html_input,
+		],
+		'shouldAddBeaconWhenDonotoptimizeAndSaaSVisit' => [
+			'config' => [
+				'donotrocketoptimize' => true,
+				'sass_visit' => true,
+				'html' => $html_input,
+				'atf' => [
+					'row' => null,
+				],
+				'lrc' => [
+					'row' => null,
+				],
+			],
+			'expected' => $html_output_with_beacon,
 		],
 		'shouldAddBeaconToPage' => [
 			'config' => [
@@ -91,6 +143,16 @@ return [
 				'lrc' => $lrc,
 			],
 			'expected' => $html_output_with_preload,
+		],
+		'shoudNotAddBeaconToPageWhenLoggedInAndUserCacheEnabled' => [
+			'config' => [
+				'html' => $html_input,
+				'atf' => [],
+				'lrc' => [],
+				'is_logged_in' => true,
+				'user_cache_enabled' => 1,
+			],
+			'expected' => $html_output,
 		],
 		'shouldNotAddBeaconToPageWhenPerformanceHintsFailed' => [
 			'config' => [
