@@ -267,6 +267,8 @@ class Assets {
 			}
 		}
 
+		$button_aria_label = esc_attr__( 'play Youtube video', 'wp-rocket' );
+
 		/**
 		 * Filters the patterns excluded from lazyload for youtube thumbnails.
 		 *
@@ -280,7 +282,7 @@ class Assets {
 
 		$excluded_patterns = wp_json_encode( $excluded_patterns );
 
-		return "<script>function lazyLoadThumb(e,alt,l){var t='{$image}',a='<button class=\"play\" aria-label=\"play Youtube video\"></button>';if(l){t=t.replace('data-lazy-','');t=t.replace('loading=\"lazy\"','');t=t.replace(/<noscript>.*?<\/noscript>/g,'');}t=t.replace('alt=\"\"','alt=\"'+alt+'\"');return t.replace(\"ID\",e)+a}function lazyLoadYoutubeIframe(){var e=document.createElement(\"iframe\"),t=\"ID?autoplay=1\";t+=0===this.parentNode.dataset.query.length?\"\":\"&\"+this.parentNode.dataset.query;e.setAttribute(\"src\",t.replace(\"ID\",this.parentNode.dataset.src)),e.setAttribute(\"frameborder\",\"0\"),e.setAttribute(\"allowfullscreen\",\"1\"),e.setAttribute(\"allow\",\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\"),this.parentNode.parentNode.replaceChild(e,this.parentNode)}document.addEventListener(\"DOMContentLoaded\",function(){var exclusions={$excluded_patterns};var e,t,p,u,l,a=document.getElementsByClassName(\"rll-youtube-player\");for(t=0;t<a.length;t++)(e=document.createElement(\"div\")),(u='{$image_url}'),(u=u.replace('ID',a[t].dataset.id)),(l=exclusions.some(exclusion=>u.includes(exclusion))),e.setAttribute(\"data-id\",a[t].dataset.id),e.setAttribute(\"data-query\",a[t].dataset.query),e.setAttribute(\"data-src\",a[t].dataset.src),(e.innerHTML=lazyLoadThumb(a[t].dataset.id,a[t].dataset.alt,l)),a[t].appendChild(e),(p=e.querySelector(\".play\")),(p.onclick=lazyLoadYoutubeIframe)});</script>";
+		return "<script>function lazyLoadThumb(e,alt,l){var t='{$image}',a='<button class=\"play\" aria-label=\"{$button_aria_label}\"></button>';if(l){t=t.replace('data-lazy-','');t=t.replace('loading=\"lazy\"','');t=t.replace(/<noscript>.*?<\/noscript>/g,'');}t=t.replace('alt=\"\"','alt=\"'+alt+'\"');return t.replace(\"ID\",e)+a}function lazyLoadYoutubeIframe(){var e=document.createElement(\"iframe\"),t=\"ID?autoplay=1\";t+=0===this.parentNode.dataset.query.length?\"\":\"&\"+this.parentNode.dataset.query;e.setAttribute(\"src\",t.replace(\"ID\",this.parentNode.dataset.src)),e.setAttribute(\"frameborder\",\"0\"),e.setAttribute(\"allowfullscreen\",\"1\"),e.setAttribute(\"allow\",\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\"),this.parentNode.parentNode.replaceChild(e,this.parentNode)}document.addEventListener(\"DOMContentLoaded\",function(){var exclusions={$excluded_patterns};var e,t,p,u,l,a=document.getElementsByClassName(\"rll-youtube-player\");for(t=0;t<a.length;t++)(e=document.createElement(\"div\")),(u='{$image_url}'),(u=u.replace('ID',a[t].dataset.id)),(l=exclusions.some(exclusion=>u.includes(exclusion))),e.setAttribute(\"data-id\",a[t].dataset.id),e.setAttribute(\"data-query\",a[t].dataset.query),e.setAttribute(\"data-src\",a[t].dataset.src),(e.innerHTML=lazyLoadThumb(a[t].dataset.id,a[t].dataset.alt,l)),a[t].appendChild(e),(p=e.querySelector(\".play\")),(p.onclick=lazyLoadYoutubeIframe)});</script>";
 	}
 
 	/**
